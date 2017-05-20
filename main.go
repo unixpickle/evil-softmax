@@ -18,11 +18,13 @@ func main() {
 	var numActions int
 	var stepSize float64
 	var maxSteps int
+	var natural bool
 
 	flag.Float64Var(&initStddev, "stddev", 1, "standard deviation for initial params")
 	flag.IntVar(&numActions, "actions", 10, "number of different actions")
 	flag.Float64Var(&stepSize, "step", 0.01, "SGD step size")
 	flag.IntVar(&maxSteps, "maxsteps", 0, "max SGD steps")
+	flag.BoolVar(&natural, "natural", false, "use natural gradient")
 
 	flag.Parse()
 
@@ -41,6 +43,11 @@ func main() {
 
 		grad := anydiff.NewGrad(paramVar)
 		reward.Propagate(anyvec.Ones(c, 1), grad)
+
+		if natural {
+			fisher := Fisher(params)
+			grad[paramVar] = NaturalGradient(fisher, grad[paramVar])
+		}
 
 		grad.Scale(c.MakeNumeric(stepSize))
 		grad.AddToVars()

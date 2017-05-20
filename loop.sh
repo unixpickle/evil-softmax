@@ -10,7 +10,7 @@
 
 while true
 do
-  out=$(go run main.go $@ 2>&1 | tail -n 1 | grep 'correct=true')
+  out=$(go run *.go $@ 2>&1 | tail -n 1 | grep 'correct=true')
   if [ "$out" = "" ]; then
     echo 0
   else
